@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -33,19 +35,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.studysmart.R
 import com.example.studysmart.domain.model.Subject
+import com.example.studysmart.domain.model.Task
 import com.example.studysmart.ui.presentation.components.CountCard
 import com.example.studysmart.ui.presentation.components.SubjectCard
+import com.example.studysmart.ui.presentation.components.tasksList
 
 @Preview
 @Composable
 fun DashboardScreen() {
     val subjects = listOf(
-        Subject("English",10f,Subject.subjectCardColors[0]),
-        Subject("Physics",10f,Subject.subjectCardColors[1]),
-        Subject("Maths",10f,Subject.subjectCardColors[2]),
-        Subject("Geology",10f,Subject.subjectCardColors[3]),
-        Subject("Fine Arts",10f,Subject.subjectCardColors[4]),
+        Subject("English", 10f, Subject.subjectCardColors[0]),
+        Subject("Physics", 10f, Subject.subjectCardColors[1]),
+        Subject("Maths", 10f, Subject.subjectCardColors[2]),
+        Subject("Geology", 10f, Subject.subjectCardColors[3]),
+        Subject("Fine Arts", 10f, Subject.subjectCardColors[4]),
     )
+    val tasks = listOf(
+        Task("Prepare notes","",0L,1,"",false),
+        Task("Do Homework","",0L,1,"",true),
+        Task("Go Coaching","",0L,1,"",false),
+        Task("Assignment","",0L,1,"",false),
+        Task("Write Poew","",0L,1,"",true),
+
+    )
+
 
 
     Scaffold(
@@ -72,6 +85,22 @@ fun DashboardScreen() {
                     subjectList = subjects
                 )
             }
+            item {
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 48.dp, vertical = 20.dp)
+                ) {
+                    Text(text = "Start Study Session")
+                }
+            }
+            tasksList(
+                sectionTitle = "UPCOMİNG TASKS",
+                emptyListText = "You don't have any upcoming tasks.\n"+
+                        "Click the + button in subject screen to add new task "
+                , tasks = tasks)
+
         }
     }
 }
@@ -166,7 +195,7 @@ private fun SubjectCardsSection(
         ) {
             items(subjectList) { subject ->
                 SubjectCard(
-                    subjectName =subject.name,
+                    subjectName = subject.name,
                     gradientColors = subject.colors,
                     onClick = {}
                 )
