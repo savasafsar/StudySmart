@@ -98,7 +98,7 @@ fun DashboardScreen() {
             tasksList(
                 sectionTitle = "UPCOMİNG TASKS",
                 emptyListText = "You don't have any upcoming tasks.\n"+
-                        "Click the + button in subject screen to add new task "
+                        "Click the + button in subject screen to add new taskkk "
                 , tasks = tasks)
 
         }
