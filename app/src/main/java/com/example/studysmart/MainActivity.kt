@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.ui.presentation.dashboard.DashboardScreen
 import com.example.studysmart.ui.presentation.dashboard.DashboardScreenTopBar
+import com.example.studysmart.ui.presentation.session.SessionScreen
 import com.example.studysmart.ui.presentation.task.TaskScreen
 import com.example.studysmart.ui.theme.StudySmartTheme
 
@@ -21,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StudySmartTheme {
-              TaskScreen()
+              SessionScreen()
             }
         }
     }
@@ -56,6 +58,43 @@ class MainActivity : ComponentActivity() {
         colors = Subject.subjectCardColors[4],
         subjectId = 0
     ),
+)
+val sessions = listOf(
+    Session(
+        relatedToSubject = "English",
+        date = 0L,
+        duration = 2,
+        sessionSubjectId = 0,
+        sessionId = 0
+    ),
+    Session(
+        relatedToSubject = "English",
+        date = 0L,
+        duration = 2,
+        sessionSubjectId = 0,
+        sessionId = 0
+    ),
+    Session(
+        relatedToSubject = "Physics",
+        date = 0L,
+        duration = 2,
+        sessionSubjectId = 0,
+        sessionId = 0
+    ),
+    Session(
+        relatedToSubject = "Maths",
+        date = 0L,
+        duration = 2,
+        sessionSubjectId = 0,
+        sessionId = 0
+    ),
+    Session(
+        relatedToSubject = "English",
+        date = 0L,
+        duration = 2,
+        sessionSubjectId = 0,
+        sessionId = 0
+    )
 )
 
 
