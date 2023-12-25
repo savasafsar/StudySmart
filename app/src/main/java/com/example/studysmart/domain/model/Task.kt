@@ -9,5 +9,4 @@ data class Task(
     val isComplete : Boolean,
     val taskSubjectId : Int,
     val taskId : Int,
-
 )
