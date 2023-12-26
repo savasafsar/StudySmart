@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.example.studysmart.ui.presentation.dashboard
 
 import androidx.compose.foundation.Image
@@ -54,32 +52,65 @@ import com.example.studysmart.ui.presentation.components.DeleteDialog
 import com.example.studysmart.ui.presentation.components.SubjectCard
 import com.example.studysmart.ui.presentation.components.studySessionList
 import com.example.studysmart.ui.presentation.components.tasksList
+import com.example.studysmart.ui.presentation.destinations.SessionScreenRouteDestination
+import com.example.studysmart.ui.presentation.destinations.SubjectScreenRouteDestination
+import com.example.studysmart.ui.presentation.destinations.TaskScreenRouteDestination
+import com.example.studysmart.ui.presentation.subject.SubjectScreenNavArgs
+import com.example.studysmart.ui.presentation.task.TaskScreenNavArgs
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Preview
+@Destination(start = true)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreenRoute(
+    navigator: DestinationsNavigator
+) {
+    DashboardScreen(
+        onSubjectCardClick = { subjectId ->
+            subjectId?.let {
+                val navArg = SubjectScreenNavArgs(subjectId = subjectId)
+                navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
+            }
+        },
+        onTaskCardClick = { taskId ->
+            val navArg = TaskScreenNavArgs(taskId = taskId, subjectId = null)
+            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+        },
+        onStartSessionButtonClick = {
+            navigator.navigate(SessionScreenRouteDestination())
+        }
+    )
+}
+
+
+@Composable
+private fun DashboardScreen(
+    onSubjectCardClick: (Int?) -> Unit,
+    onTaskCardClick: (Int?) -> Unit,
+    onStartSessionButtonClick: () -> Unit
+) {
 
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
+
     var subjectName by remember { mutableStateOf("") }
     var goalHours by remember { mutableStateOf("") }
-    var selectedColor by remember {
-        mutableStateOf(Subject.subjectCardColors.random())
-    }
+    var selectedColor by remember { mutableStateOf(Subject.subjectCardColors.random()) }
+
     AddSubjectDialog(
         isOpen = isAddSubjectDialogOpen,
         subjectName = subjectName,
-        goalHours =goalHours ,
-        onColorChange = { selectedColor=it },
-        onGoalHoursChange = {goalHours=it},
-        onSubjectNameChange = {subjectName=it},
+        goalHours = goalHours,
+        onSubjectNameChange = { subjectName = it },
+        onGoalHoursChange = { goalHours = it },
         selectedColors = selectedColor,
+        onColorChange = { selectedColor = it },
         onDismissRequest = { isAddSubjectDialogOpen = false },
         onConfirmButtonClick = {
             isAddSubjectDialogOpen = false
         }
-
     )
+
     DeleteDialog(
         isOpen = isDeleteSessionDialogOpen,
         title = "Delete Session?",
@@ -88,8 +119,6 @@ fun DashboardScreen() {
         onDismissRequest = { isDeleteSessionDialogOpen = false },
         onConfirmButtonClick = { isDeleteSessionDialogOpen = false }
     )
-
-
 
     Scaffold(
         topBar = { DashboardScreenTopBar() }
@@ -100,7 +129,7 @@ fun DashboardScreen() {
                 .padding(paddingValues)
         ) {
             item {
-                CountCardSection(
+                CountCardsSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
@@ -113,12 +142,13 @@ fun DashboardScreen() {
                 SubjectCardsSection(
                     modifier = Modifier.fillMaxWidth(),
                     subjectList = subjects,
-                    onAddIconClicked =  { isAddSubjectDialogOpen = true }
+                    onAddIconClicked = { isAddSubjectDialogOpen = true },
+                    onSubjectCardClick = onSubjectCardClick
                 )
             }
             item {
                 Button(
-                    onClick = {},
+                    onClick = onStartSessionButtonClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 48.dp, vertical = 20.dp)
@@ -127,50 +157,48 @@ fun DashboardScreen() {
                 }
             }
             tasksList(
-                sectionTitle = "UPCOMİNG TASKS",
-                emptyListText = "You don't have any upcoming tasks.\n"+
-                        "Click the + button in subject screen to add new task "
-                , tasks = tasks,
+                sectionTitle = "UPCOMING TASKS",
+                emptyListText = "You don't have any upcoming tasks.\n " +
+                        "Click the + button in subject screen to add new task.",
+                tasks = tasks,
                 onCheckBoxClick = {},
-                onTaskCardClick = {}
-                )
+                onTaskCardClick = onTaskCardClick
+            )
             item {
                 Spacer(modifier = Modifier.height(20.dp))
             }
             studySessionList(
-                sectionTitle = "ReCENT STUDY SESSIONS",
-                emptyListText = "You don't have any recent study sessions.\n"+
-                        "Start a study session to begin recording your progress  ",
+                sectionTitle = "RECENT STUDY SESSIONS",
+                emptyListText = "You don't have any recent study sessions.\n " +
+                        "Start a study session to begin recording your progress.",
                 sessions = sessions,
-                onDeleteIconClick = {isDeleteSessionDialogOpen =true}
+                onDeleteIconClick = { isDeleteSessionDialogOpen = true }
             )
-
         }
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreenTopBar() {
-    CenterAlignedTopAppBar(title = {
-        Text(
-            text = "StudySmart",
-            style = MaterialTheme.typography.headlineMedium
-        )
-    })
+private fun DashboardScreenTopBar() {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = "StudySmart",
+                style = MaterialTheme.typography.headlineMedium
+            )
+        }
+    )
 }
 
 @Composable
-private fun CountCardSection(
+private fun CountCardsSection(
     modifier: Modifier,
     subjectCount: Int,
     studiedHours: String,
     goalHours: String
 ) {
-    Row(
-        modifier = modifier
-    ) {
+    Row(modifier = modifier) {
         CountCard(
             modifier = Modifier.weight(1f),
             headingText = "Subject Count",
@@ -195,8 +223,9 @@ private fun CountCardSection(
 private fun SubjectCardsSection(
     modifier: Modifier,
     subjectList: List<Subject>,
-     onAddIconClicked:() -> Unit,
-    emptyListText: String = "You don't have any subjects.\n Click the + button to add new subject."
+    emptyListText: String = "You don't have any subjects.\n Click the + button to add new subject.",
+    onAddIconClicked: () -> Unit,
+    onSubjectCardClick: (Int?) -> Unit
 ) {
     Column(modifier = modifier) {
         Row(
@@ -204,20 +233,16 @@ private fun SubjectCardsSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             Text(
                 text = "SUBJECTS",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(start = 12.dp)
             )
-            IconButton(onClick = { onAddIconClicked()
-                println("Butona tıklandı")
-            }) {
+            IconButton(onClick = onAddIconClicked) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add Subject"
                 )
-
             }
         }
         if (subjectList.isEmpty()) {
@@ -225,7 +250,7 @@ private fun SubjectCardsSection(
                 modifier = Modifier
                     .size(120.dp)
                     .align(Alignment.CenterHorizontally),
-                painter = painterResource(id = R.drawable.img_books),
+                painter = painterResource(R.drawable.img_books),
                 contentDescription = emptyListText
             )
             Text(
@@ -244,7 +269,7 @@ private fun SubjectCardsSection(
                 SubjectCard(
                     subjectName = subject.name,
                     gradientColors = subject.colors,
-                    onClick = {}
+                    onClick = { onSubjectCardClick(subject.subjectId) }
                 )
             }
         }
