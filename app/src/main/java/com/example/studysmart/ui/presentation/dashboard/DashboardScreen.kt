@@ -1,5 +1,6 @@
 package com.example.studysmart.ui.presentation.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -70,6 +71,7 @@ fun DashboardScreenRoute(
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
                 val navArg = SubjectScreenNavArgs(subjectId = subjectId)
+                Log.d("tıklandı","tıklandı")
                 navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
             }
         },
