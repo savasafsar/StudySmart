@@ -50,9 +50,7 @@ import javax.security.auth.Subject
 fun SessionScreenRoute(
     navigator: DestinationsNavigator
 ) {
- SessionScreen(
-     onBackButtonClick = {navigator.navigateUp()}
- )
+    SessionScreen(onBackButtonClick = {navigator.navigateUp()})
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

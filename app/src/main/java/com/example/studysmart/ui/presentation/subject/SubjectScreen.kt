@@ -50,14 +50,16 @@ import com.example.studysmart.ui.presentation.components.DeleteDialog
 import com.example.studysmart.ui.presentation.components.studySessionList
 import com.example.studysmart.ui.presentation.components.tasksList
 import com.example.studysmart.ui.presentation.destinations.TaskScreenRouteDestination
+
 import com.example.studysmart.ui.presentation.task.TaskScreenNavArgs
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 data class SubjectScreenNavArgs(
-    val subjectId : Int
+    val subjectId: Int
 
 )
+
 @Destination(navArgsDelegate = SubjectScreenNavArgs::class)
 @Composable
 fun SubjectScreenRoute(
@@ -66,21 +68,21 @@ fun SubjectScreenRoute(
     SubjectScreen(
         onBackButtonClick = { navigator.navigateUp() },
         onAddTaskButtonClick = {
-            val navArg = TaskScreenNavArgs(taskId = null,subjectId = -1)
+            val navArg = TaskScreenNavArgs(taskId = null , subjectId = -1)
             navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
-                               },
-        onTaskCardClick = {taskId->
-            val navArg = TaskScreenNavArgs(taskId = taskId,subjectId = null)
+        },
+        onTaskCardClick = { taskId ->
+            val navArg = TaskScreenNavArgs(taskId = taskId , subjectId = null)
             navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
-        }
-
+        },
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SubjectScreen(
     onBackButtonClick: () -> Unit,
-    onAddTaskButtonClick:()-> Unit,
+    onAddTaskButtonClick: () -> Unit,
     onTaskCardClick: (Int?) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -133,10 +135,10 @@ private fun SubjectScreen(
 
                 title = "English",
                 onBackButtonClick = onBackButtonClick,
-                onDeleteButtonClick = {isDeleteSubjectDialogOpen =true},
-                onEditButtonClick = {isAddSubjectDialogOpen = true},
+                onDeleteButtonClick = { isDeleteSubjectDialogOpen = true },
+                onEditButtonClick = { isAddSubjectDialogOpen = true },
                 scrollBehavior = scrollBehavior
-            ) 
+            )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -146,7 +148,7 @@ private fun SubjectScreen(
                 expanded = isFABExpanded
             )
         }
-    ) {paddingvalues ->
+    ) { paddingvalues ->
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -158,8 +160,8 @@ private fun SubjectScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    goalHours ="10",
-                    studyHours ="15",
+                    goalHours = "10",
+                    studyHours = "15",
                     progress = 0.75f
                 )
             }
@@ -190,7 +192,7 @@ private fun SubjectScreen(
                 emptyListText = "You don't have any recent study sessions.\n " +
                         "Start a study session to begin recording your progress.",
                 sessions = sessions,
-                onDeleteIconClick = { isDeleteSessionDialogOpen=true}
+                onDeleteIconClick = { isDeleteSessionDialogOpen = true }
             )
         }
     }
@@ -205,7 +207,7 @@ private fun SubjectScreenTopBar(
     onEditButtonClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 
-    ) {
+) {
     LargeTopAppBar(
         scrollBehavior = scrollBehavior,
         navigationIcon = {
@@ -213,19 +215,23 @@ private fun SubjectScreenTopBar(
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "navigate back")
             }
         },
-        title = { Text(
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.headlineSmall
-        ) },
+        title = {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
         actions = {
             IconButton(onClick = onDeleteButtonClick) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete subject"
+                Icon(
+                    imageVector = Icons.Default.Delete, contentDescription = "Delete subject"
                 )
             }
-            IconButton(onClick =  onEditButtonClick ) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit subject"
+            IconButton(onClick = onEditButtonClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit, contentDescription = "Edit subject"
                 )
             }
         }
@@ -235,18 +241,18 @@ private fun SubjectScreenTopBar(
 @Composable
 private fun SubjectOverviewSection(
     modifier: Modifier,
-    goalHours :String,
-    studyHours :String,
-    progress:Float
+    goalHours: String,
+    studyHours: String,
+    progress: Float
 ) {
     val percentageProgress = remember(key1 = progress) {
-        (progress*100).toInt().coerceIn(0,100)
+        (progress * 100).toInt().coerceIn(0, 100)
     }
-    Row (
-        modifier= modifier,
+    Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         CountCard(
             modifier = Modifier.weight(1f),
             headingText = "Goal Study Hours",
@@ -259,9 +265,10 @@ private fun SubjectOverviewSection(
             count = studyHours
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Box(modifier = Modifier.size(75.dp),
+        Box(
+            modifier = Modifier.size(75.dp),
             contentAlignment = Alignment.Center
-            ) {
+        ) {
             CircularProgressIndicator(
                 modifier = Modifier.fillMaxSize(),
                 progress = 1f,

@@ -67,10 +67,9 @@ data class TaskScreenNavArgs(
 fun TaskScreenRoute(
     navigator: DestinationsNavigator
 ) {
-    TaskScreen(
-        onBackButtonClick = {navigator.navigateUp()}
-    )
+    TaskScreen(onBackButtonClick = { navigator.navigateUp() })
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskScreen(

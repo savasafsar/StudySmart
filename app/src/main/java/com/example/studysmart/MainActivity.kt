@@ -10,6 +10,7 @@ import com.example.studysmart.ui.presentation.NavGraphs
 import com.example.studysmart.ui.theme.StudySmartTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

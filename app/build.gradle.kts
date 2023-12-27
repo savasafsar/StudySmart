@@ -73,9 +73,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc01")
 
     //compose destination
-    val destinationVersion = "1.9.52"
-    implementation("io.github.raamcosta.compose-destinations:core:$destinationVersion")
-    ksp("io.github.raamcosta.compose-destinations:ksp:$destinationVersion")
+
+    ksp ("io.github.raamcosta.compose-destinations:ksp:1.9.52")
+    implementation ("io.github.raamcosta.compose-destinations:core:1.9.52")
+
 
     // Room
     val roomVersion = "2.5.2"

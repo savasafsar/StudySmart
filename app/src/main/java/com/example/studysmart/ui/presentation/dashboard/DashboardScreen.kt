@@ -65,6 +65,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun DashboardScreenRoute(
     navigator: DestinationsNavigator
 ) {
+
     DashboardScreen(
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
@@ -77,11 +78,10 @@ fun DashboardScreenRoute(
             navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
         },
         onStartSessionButtonClick = {
-            navigator.navigate(SessionScreenRouteDestination())
+            navigator.navigate(SessionScreenRouteDestination)
         }
     )
 }
-
 
 @Composable
 private fun DashboardScreen(
