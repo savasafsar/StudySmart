@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.studysmart.ui.presentation.components
 
 import androidx.compose.animation.expandHorizontally
@@ -33,14 +35,16 @@ fun SubjectCard(
     Box(
         modifier = Modifier
             .size(150.dp)
-            .clickable { onClick }
+            .clickable { onClick() }
             .background(
                 brush = Brush.verticalGradient(gradientColors),
                 shape = MaterialTheme.shapes.medium
             )
     ) {
         Column(
-            modifier = modifier.padding(12.dp),
+
+            modifier = modifier.padding(12.dp)
+                ,
             verticalArrangement = Arrangement.Center
         ) {
             Image(

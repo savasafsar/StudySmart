@@ -7,6 +7,8 @@ import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.domain.model.Task
 import com.example.studysmart.ui.presentation.NavGraphs
+
+
 import com.example.studysmart.ui.theme.StudySmartTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 
@@ -16,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StudySmartTheme {
-                DestinationsNavHost(navGraph = NavGraphs.root)
+                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }

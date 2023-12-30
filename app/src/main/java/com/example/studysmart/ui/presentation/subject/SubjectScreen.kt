@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.sessions
 import com.example.studysmart.tasks
@@ -50,16 +51,13 @@ import com.example.studysmart.ui.presentation.components.DeleteDialog
 import com.example.studysmart.ui.presentation.components.studySessionList
 import com.example.studysmart.ui.presentation.components.tasksList
 import com.example.studysmart.ui.presentation.destinations.TaskScreenRouteDestination
-
 import com.example.studysmart.ui.presentation.task.TaskScreenNavArgs
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 data class SubjectScreenNavArgs(
     val subjectId: Int
-
 )
-
 @Destination(navArgsDelegate = SubjectScreenNavArgs::class)
 @Composable
 fun SubjectScreenRoute(
@@ -68,28 +66,30 @@ fun SubjectScreenRoute(
     SubjectScreen(
         onBackButtonClick = { navigator.navigateUp() },
         onAddTaskButtonClick = {
-            val navArg = TaskScreenNavArgs(taskId = null , subjectId = -1)
-            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+            val navArg = TaskScreenNavArgs(taskId = null, subjectId = -1)
+           navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
         },
         onTaskCardClick = { taskId ->
-            val navArg = TaskScreenNavArgs(taskId = taskId , subjectId = null)
+            val navArg = TaskScreenNavArgs(taskId = taskId, subjectId = null)
             navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
-        },
+        }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SubjectScreen(
+ private fun SubjectScreen(
+
     onBackButtonClick: () -> Unit,
     onAddTaskButtonClick: () -> Unit,
     onTaskCardClick: (Int?) -> Unit
 ) {
+
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val listState = rememberLazyListState()
     val isFABExpanded by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
 
-    var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var isEditSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -98,16 +98,16 @@ private fun SubjectScreen(
     var selectedColor by remember { mutableStateOf(Subject.subjectCardColors.random()) }
 
     AddSubjectDialog(
-        isOpen = isAddSubjectDialogOpen,
+        isOpen = isEditSubjectDialogOpen,
         subjectName = subjectName,
         goalHours = goalHours,
         onSubjectNameChange = { subjectName = it },
         onGoalHoursChange = { goalHours = it },
         selectedColors = selectedColor,
         onColorChange = { selectedColor = it },
-        onDismissRequest = { isAddSubjectDialogOpen = false },
+        onDismissRequest = { isEditSubjectDialogOpen = false },
         onConfirmButtonClick = {
-            isAddSubjectDialogOpen = false
+            isEditSubjectDialogOpen = false
         }
     )
 
@@ -128,15 +128,15 @@ private fun SubjectScreen(
         onDismissRequest = { isDeleteSessionDialogOpen = false },
         onConfirmButtonClick = { isDeleteSessionDialogOpen = false }
     )
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             SubjectScreenTopBar(
-
                 title = "English",
                 onBackButtonClick = onBackButtonClick,
                 onDeleteButtonClick = { isDeleteSubjectDialogOpen = true },
-                onEditButtonClick = { isAddSubjectDialogOpen = true },
+                onEditButtonClick = { isEditSubjectDialogOpen = true },
                 scrollBehavior = scrollBehavior
             )
         },
@@ -148,20 +148,20 @@ private fun SubjectScreen(
                 expanded = isFABExpanded
             )
         }
-    ) { paddingvalues ->
+    ) { paddingValue ->
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingvalues)
+                .padding(paddingValue)
         ) {
             item {
                 SubjectOverviewSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    goalHours = "10",
-                    studyHours = "15",
+                    studiedHours = "10",
+                    goalHours = "15",
                     progress = 0.75f
                 )
             }
@@ -206,13 +206,15 @@ private fun SubjectScreenTopBar(
     onDeleteButtonClick: () -> Unit,
     onEditButtonClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
-
 ) {
     LargeTopAppBar(
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(onClick = onBackButtonClick) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "navigate back")
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "navigate back"
+                )
             }
         },
         title = {
@@ -226,12 +228,14 @@ private fun SubjectScreenTopBar(
         actions = {
             IconButton(onClick = onDeleteButtonClick) {
                 Icon(
-                    imageVector = Icons.Default.Delete, contentDescription = "Delete subject"
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Subject"
                 )
             }
             IconButton(onClick = onEditButtonClick) {
                 Icon(
-                    imageVector = Icons.Default.Edit, contentDescription = "Edit subject"
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Subject"
                 )
             }
         }
@@ -241,13 +245,14 @@ private fun SubjectScreenTopBar(
 @Composable
 private fun SubjectOverviewSection(
     modifier: Modifier,
+    studiedHours: String,
     goalHours: String,
-    studyHours: String,
     progress: Float
 ) {
-    val percentageProgress = remember(key1 = progress) {
+    val percentageProgress = remember(progress) {
         (progress * 100).toInt().coerceIn(0, 100)
     }
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceAround,
@@ -262,7 +267,7 @@ private fun SubjectOverviewSection(
         CountCard(
             modifier = Modifier.weight(1f),
             headingText = "Study Hours",
-            count = studyHours
+            count = studiedHours
         )
         Spacer(modifier = Modifier.width(10.dp))
         Box(
@@ -280,7 +285,7 @@ private fun SubjectOverviewSection(
                 modifier = Modifier.fillMaxSize(),
                 progress = progress,
                 strokeWidth = 4.dp,
-                strokeCap = StrokeCap.Round,
+                strokeCap = StrokeCap.Round
             )
             Text(text = "$percentageProgress%")
         }
