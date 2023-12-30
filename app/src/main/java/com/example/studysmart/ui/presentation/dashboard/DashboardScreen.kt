@@ -33,17 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.studysmart.R
-import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
-import com.example.studysmart.domain.model.Task
 import com.example.studysmart.sessions
 import com.example.studysmart.subjects
 import com.example.studysmart.tasks
@@ -59,19 +56,18 @@ import com.example.studysmart.ui.presentation.destinations.TaskScreenRouteDestin
 import com.example.studysmart.ui.presentation.subject.SubjectScreenNavArgs
 import com.example.studysmart.ui.presentation.task.TaskScreenNavArgs
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-
-@Destination(start = true)
+@RootNavGraph(start = true)
+@Destination()
 @Composable
-fun DashboardScreenRoute(
-    navigator: DestinationsNavigator
-) {
-
+fun DasboardScreenRoute(
+    navigator :DestinationsNavigator
+ ){
     DashboardScreen(
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
                 val navArg = SubjectScreenNavArgs(subjectId = subjectId)
-                Log.d("tıklandı","tıklandı")
                 navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
             }
         },
@@ -80,13 +76,14 @@ fun DashboardScreenRoute(
             navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
         },
         onStartSessionButtonClick = {
-            navigator.navigate(SessionScreenRouteDestination)
+            navigator.navigate(SessionScreenRouteDestination())
         }
     )
 }
 
 @Composable
-private fun DashboardScreen(
+ private fun DashboardScreen(
+
     onSubjectCardClick: (Int?) -> Unit,
     onTaskCardClick: (Int?) -> Unit,
     onStartSessionButtonClick: () -> Unit
