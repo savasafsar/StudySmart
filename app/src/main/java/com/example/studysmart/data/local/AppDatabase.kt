@@ -6,9 +6,7 @@ import androidx.room.TypeConverters
 import com.example.studysmart.domain.model.*
 
 @Database(
-    entities = [Subject::class, Session::class, Task::class],
-    version = 1
-)
+    entities = [Subject::class, Session::class, Task::class], version = 2)
 @TypeConverters(ColorListConverter::class)
 abstract class AppDatabase: RoomDatabase() {
 

@@ -4,22 +4,26 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
-import javax.security.auth.Subject
+import com.example.studysmart.domain.model.Subject
 
 @Dao
 interface SubjectDao {
     @Upsert
-    fun upsertSubject(subject: com.example.studysmart.domain.model.Subject)
+    suspend fun upsertSubject(subject: Subject)
 
-    @Query("SELECT COUNT(*) FROM SUBJECT ")
-    fun getTotalSubjectCount(): Int
-    @Query("SELECT SUM(goalHours) FROM SUBJECT ")
-    fun getTotalGoalHours(): Flow<Int>
-    @Query("SELECT * FROM Subject WHERE subjectId = :subjectId ")
-   suspend fun getSubjectById(subjectId: Int): Subject?
+    @Query("SELECT COUNT(*) FROM SUBJECT")
+    fun getTotalSubjectCount(): Flow<Int>
 
-    @Query("DELETE FROM Subject WHERE subjectId = :subjectId ")
+    @Query("SELECT SUM(goalHours) FROM SUBJECT")
+    fun getTotalGoalHours(): Flow<Float>
+
+    @Query("SELECT * FROM Subject WHERE subjectId = :subjectId")
+    suspend fun getSubjectById(subjectId: Int): Subject?
+
+
+    @Query("DELETE FROM Subject WHERE subjectId = :subjectId")
     suspend fun deleteSubject(subjectId: Int)
-    @Query("SELECT * FROM Subject ")
+
+    @Query("SELECT * FROM Subject")
     fun getAllSubjects(): Flow<List<Subject>>
 }
