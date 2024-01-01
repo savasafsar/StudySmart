@@ -122,6 +122,8 @@ fun DasboardScreenRoute(
                         duration = event.duration
                     )
                 }
+
+                SnackbarEvent.NavigateUp -> {}
             }
         }
     }
