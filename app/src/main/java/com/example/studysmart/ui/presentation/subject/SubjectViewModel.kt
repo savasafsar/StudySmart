@@ -81,8 +81,8 @@ class SubjectViewModel @Inject constructor(
                 }
             }
             SubjectEvent.UpdateSubject -> updateSubject()
-            SubjectEvent.DeleteSubject -> deleteSubject()
             SubjectEvent.DeleteSession -> TODO()
+            SubjectEvent.DeleteSubject -> deleteSubject()
             is SubjectEvent.OnTaskIsCompleteChange -> TODO()
             is SubjectEvent.onDeleteSessionButtonClick -> TODO()
             SubjectEvent.UpdateProgress -> {
@@ -139,7 +139,7 @@ class SubjectViewModel @Inject constructor(
     private fun deleteSubject() {
         viewModelScope.launch {
             try {
-                val currentSubjectId = state.value.currentSubjectId
+                val currentSubjectId:Int? = state.value.currentSubjectId
                     if (currentSubjectId !=null){
                         withContext(Dispatchers.IO) {
                         subjectRepository.deleteSubject(subjectId = currentSubjectId)
