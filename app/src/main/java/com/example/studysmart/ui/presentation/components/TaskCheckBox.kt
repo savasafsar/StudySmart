@@ -1,4 +1,3 @@
-@file:Suppress("UNUSED_EXPRESSION")
 
 package com.example.studysmart.ui.presentation.components
 
@@ -30,7 +29,7 @@ fun TaskCheckBox(
             .size(25.dp)
             .clip(CircleShape)
             .border(2.dp, borderColor, CircleShape)
-            .clickable { onCheckBoxClick },
+            .clickable { onCheckBoxClick() },
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(visible = isComplete) {
