@@ -32,7 +32,8 @@ fun Long?.changeMillisToDateString(): String {
 
 fun Long.toHours(): Float {
     val hours = this.toFloat() / 3600f
-    return "%.2f".format(hours).toFloat()
+    // Replace comma with dot and then parse the string
+    return "%.2f".format(hours).replace(',', '.').toFloat()
 }
 
 sealed class SnackbarEvent {
@@ -41,4 +42,7 @@ sealed class SnackbarEvent {
         val duration: SnackbarDuration = SnackbarDuration.Short,
     ) : SnackbarEvent()
     data object NavigateUp : SnackbarEvent()
+}
+fun Int.pad () : String {
+    return this.toString().padStart(length = 2, padChar = '0')
 }

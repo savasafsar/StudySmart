@@ -1,55 +1,107 @@
 package com.example.studysmart.ui.presentation.session
 
-import android.util.Log
+import android.content.Intent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.*
-
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.studysmart.R
 import com.example.studysmart.sessions
 import com.example.studysmart.subjects
 import com.example.studysmart.ui.presentation.components.DeleteDialog
 import com.example.studysmart.ui.presentation.components.SubjectListBottomSheet
 import com.example.studysmart.ui.presentation.components.studySessionList
-import com.example.studysmart.ui.presentation.dashboard.DashboardViewModel
+import com.example.studysmart.ui.theme.Red
+import com.example.studysmart.util.Constants.ACTION_SERVICE_CANCEL
+import com.example.studysmart.util.Constants.ACTION_SERVICE_START
+import com.example.studysmart.util.Constants.ACTION_SERVICE_STOP
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
-
-@Destination
+@Destination(
+    deepLinks = [
+        DeepLink(
+            action = Intent.ACTION_VIEW,
+            uriPattern = "study_smart://dashboard/session"
+        )
+    ]
+)
 @Composable
 fun SessionScreenRoute(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    timerService: StudySessionTimerService
 ) {
-    val viewModel : SessionViewModel = hiltViewModel()
+    val viewModel: SessionViewModel = hiltViewModel()
+
     SessionScreen(
-        onBackButtonClick = { navigator.navigateUp() }
+        onBackButtonClick = { navigator.navigateUp() },
+        timerService = timerService
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SessionScreen(
-
-    onBackButtonClick: () -> Unit
+    onBackButtonClick: () -> Unit,
+    timerService: StudySessionTimerService
 ) {
-    var isDeleteDialogOpen by rememberSaveable { mutableStateOf(false) }
+
+    val hours by timerService.hours
+    val minutes by timerService.minutes
+    val seconds by timerService.seconds
+    val currentTimerState by timerService.currentTimerState
+
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var isBottomSheetOpen by remember { mutableStateOf(false) }
+
+    var isDeleteDialogOpen by rememberSaveable { mutableStateOf(false) }
+
 
     SubjectListBottomSheet(
         sheetState = sheetState,
@@ -65,7 +117,7 @@ private fun SessionScreen(
 
     DeleteDialog(
         isOpen = isDeleteDialogOpen,
-        title = "Delete Task?",
+        title = "Delete Session?",
         bodyText = "Are you sure, you want to delete this session? " +
                 "This action can not be undone.",
         onDismissRequest = { isDeleteDialogOpen = false },
@@ -73,14 +125,10 @@ private fun SessionScreen(
             isDeleteDialogOpen = false
         }
     )
+
     Scaffold(
         topBar = {
-            SessionScreenTopBar(
-                onBackButtonClick = {
-                    onBackButtonClick()
-                    Log.d("geriatrician", "geriatrician")
-                }
-            )
+            SessionScreenTopBar(onBackButtonClick = onBackButtonClick)
         }
     ) { paddingValues ->
         LazyColumn(
@@ -92,7 +140,10 @@ private fun SessionScreen(
                 TimerSection(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .aspectRatio(1f),
+                    hours = hours,
+                    minutes = minutes,
+                    seconds = seconds
                 )
             }
             item {
@@ -101,23 +152,35 @@ private fun SessionScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp),
                     relatedToSubject = "English",
-                    selectSubjectButtonClick = {
-                        isBottomSheetOpen = true
-                    }
+                    selectSubjectButtonClick = { isBottomSheetOpen = true }
                 )
             }
             item {
-                ButtonSection(
+                ButtonsSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    startButtonClick = { },
-                    cancelButtonClick = { },
-                    finishButtonClick = { }
+                    startButtonClick = {
+                        ServiceHelper.triggerForegroundService(
+                            context = context,
+                            action = if (currentTimerState == TimerState.STARTED) {
+                                ACTION_SERVICE_STOP
+                            } else ACTION_SERVICE_START
+                        )
+                    },
+                    cancelButtonClick = {
+                        ServiceHelper.triggerForegroundService(
+                            context = context,
+                            action = ACTION_SERVICE_CANCEL
+                        )
+                    },
+                    finishButtonClick = { },
+                    timerState = currentTimerState,
+                    seconds = seconds
                 )
             }
             studySessionList(
-                sectionTitle = "STUDY SESSIONS",
+                sectionTitle = "STUDY SESSIONS HISTORY",
                 emptyListText = "You don't have any recent study sessions.\n " +
                         "Start a study session to begin recording your progress.",
                 sessions = sessions,
@@ -130,7 +193,7 @@ private fun SessionScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SessionScreenTopBar(
-    onBackButtonClick: () -> Unit,
+    onBackButtonClick: () -> Unit
 ) {
     TopAppBar(
         navigationIcon = {
@@ -142,17 +205,17 @@ private fun SessionScreenTopBar(
             }
         },
         title = {
-            Text(
-                text = "Study Sessions",
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Text(text = "Study Sessions", style = MaterialTheme.typography.headlineSmall)
         }
     )
 }
 
 @Composable
 private fun TimerSection(
-    modifier: Modifier
+    modifier: Modifier,
+    hours: String,
+    minutes: String,
+    seconds: String
 ) {
     Box(
         modifier = modifier,
@@ -163,10 +226,38 @@ private fun TimerSection(
                 .size(250.dp)
                 .border(5.dp, MaterialTheme.colorScheme.surfaceVariant, CircleShape)
         )
-        Text(
-            text = "00:05:32",
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 45.sp)
-        )
+        Row {
+            AnimatedContent(
+                targetState = hours,
+                label = hours,
+                transitionSpec = { timerTextAnimation() }
+            ) { hours ->
+                Text(
+                    text = "$hours:",
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 45.sp)
+                )
+            }
+            AnimatedContent(
+                targetState = minutes,
+                label = minutes,
+                transitionSpec = { timerTextAnimation() }
+            ) { minutes ->
+                Text(
+                    text = "$minutes:",
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 45.sp)
+                )
+            }
+            AnimatedContent(
+                targetState = seconds,
+                label = seconds,
+                transitionSpec = { timerTextAnimation() }
+            ) { seconds ->
+                Text(
+                    text = seconds,
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 45.sp)
+                )
+            }
+        }
     }
 }
 
@@ -201,29 +292,48 @@ private fun RelatedToSubjectSection(
 }
 
 @Composable
-private fun ButtonSection(
+private fun ButtonsSection(
     modifier: Modifier,
     startButtonClick: () -> Unit,
     cancelButtonClick: () -> Unit,
     finishButtonClick: () -> Unit,
+    timerState: TimerState,
+    seconds: String
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Button(onClick = cancelButtonClick) {
+        Button(
+            onClick = cancelButtonClick,
+            enabled = seconds != "00" && timerState != TimerState.STARTED
+        ) {
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                 text = "Cancel"
             )
         }
-        Button(onClick = startButtonClick) {
+        Button(
+            onClick = startButtonClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (timerState == TimerState.STARTED) Red
+                else MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            )
+        ) {
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                text = "Start"
+                text = when (timerState) {
+                    TimerState.STARTED -> "Stop"
+                    TimerState.STOPPED -> "Resume"
+                    else -> "Start"
+                }
             )
         }
-        Button(onClick = finishButtonClick) {
+        Button(
+            onClick = finishButtonClick,
+            enabled = seconds != "00" && timerState != TimerState.STARTED
+        ) {
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                 text = "Finish"
@@ -232,4 +342,9 @@ private fun ButtonSection(
     }
 }
 
-
+private fun timerTextAnimation(duration: Int = 600): ContentTransform {
+    return slideInVertically(animationSpec = tween(duration)) { fullHeight -> fullHeight } +
+            fadeIn(animationSpec = tween(duration)) togetherWith
+            slideOutVertically(animationSpec = tween(duration)) { fullHeight -> -fullHeight } +
+            fadeOut(animationSpec = tween(duration))
+}
