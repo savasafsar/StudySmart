@@ -101,12 +101,12 @@ class DashboardViewModel @Inject constructor(
                     task = task.copy(isComplete = !task.isComplete)
                 )
                 _snackbarEventFlow.emit(
-                    SnackbarEvent.ShowSnackBar("Subject saved successfully")
+                    SnackbarEvent.ShowSnackBar("Saved in completed tasks")
                 )
             } catch (e:Exception) {
                 _snackbarEventFlow.emit(
                     SnackbarEvent.ShowSnackBar(
-                        "Couldn't save subject.${e.message}",
+                        "Couldn't update task.${e.message}",
                         SnackbarDuration.Long
                     )
                 )
