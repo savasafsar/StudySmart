@@ -207,10 +207,13 @@ private fun SessionScreen(
                     },
                     finishButtonClick = {
                         val duration = timerService.duration.toLong(DurationUnit.SECONDS)
+                        if (duration>=36) {
+
                         ServiceHelper.triggerForegroundService(
                             context = context,
                             action = ACTION_SERVICE_CANCEL
                         )
+                        }
                         onEvent(SessionEvent.SaveSession(duration))
                     },
                     timerState = currentTimerState,
