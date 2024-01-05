@@ -60,7 +60,14 @@ class SessionViewModel @Inject constructor(
     }
 
     private fun insertSession(duration: Long) {
+
         viewModelScope.launch {
+            if (duration<36) {
+                _snackbarEventFlow.emit(
+                    SnackbarEvent.ShowSnackBar("Single session can not be less than 36 seconds.",)
+                )
+                return@launch
+            }
             try {
             sessionRepository.insertSession(
                session = Session(
